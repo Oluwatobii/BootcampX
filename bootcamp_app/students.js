@@ -8,17 +8,21 @@ const pool = new Pool({
 });
 
 //const conditions = process.argv;
+const cohortName = process.argv[2];
+const limit = process.argv[3] || 5;
+// Store all potentially malicious values in an array.
+const values = [`%${cohortName}%`, limit];
 
 const query = `
 SELECT students.id AS student_id, students.name AS name, cohorts.name AS cohort
 FROM students
 JOIN cohorts ON cohorts.id = cohort_id
-WHERE cohorts.name LIKE '%${process.argv[2]}%'
-LIMIT ${process.argv[3] || 5};
+WHERE cohorts.name LIKE $1
+LIMIT $2;
 `;
 
 pool
-  .query(query)
+  .query(query, values)
   .then((res) => {
     res.rows.forEach((user) => {
       console.log(
